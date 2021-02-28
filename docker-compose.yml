@@ -1,0 +1,43 @@
+version: '2'
+
+services:
+  phpfpm:
+    tty: true
+    image: 'docker.io/bitnami/php-fpm:7.4-debian-10'
+    networks:
+      - app-tier
+    ports:
+      - 9000:9000
+    volumes:
+      - .:/app
+
+  nginx:
+    image: 'bitnami/nginx:latest'
+    depends_on:
+      - phpfpm
+    networks:
+      - app-tier
+    ports:
+      - 80:8080
+      - 443:443
+    volumes:
+      - ./nginx.conf:/opt/bitnami/nginx/conf/server_blocks/auth-service.conf
+
+  db:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: auth_service
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin_pass
+      MYSQL_ROOT_PASSWORD: root
+    networks:
+      - app-tier
+    ports:
+      - 9090:9000
+    volumes:
+      - ./tmp/db:/var/lib/postgresql/data
+
+networks:
+  app-tier:
+    driver: bridge
