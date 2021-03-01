@@ -16,3 +16,14 @@
 $router->get('/', function () use ($router) {
     return $router->app->version();
 });
+
+$router->group(['prefix' => 'api/v1'], function() use ($router) {
+    $router->post('user', 'UserController@store');
+    $router->post('login', [UserController::class, 'login']);
+
+    $router->group(['middleware' => 'auth'], function() use ($router) {
+        $router->put('user/{id}', 'UserController@update');
+        $router->delete('user/{id}', 'UserController@destory');
+        $router->get('logout', 'UserController@logout');
+    });
+});
