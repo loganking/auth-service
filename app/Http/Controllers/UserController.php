@@ -22,9 +22,9 @@ class UserController extends Controller
     public function store(Request $request)
     {
         $this->validate($request, [
-            'name' => 'required',
-            'email' => 'required|email|unique:users',
-            'password' => 'required',
+            'name' => 'required|string|max:100',
+            'email' => 'required|email|unique:users|max:100',
+            'password' => 'required|max:100',
         ]);
 
         $hash = app('hash')->make($request->password);
@@ -37,12 +37,42 @@ class UserController extends Controller
         return response()->json($user, 201);
     }
 
-    public function list()
+    public function update(Request $request, $userId)
     {
-        $users = app('db')->table('user')->get();
+        $this->validate($request, [
+            'name' => 'string|max:100',
+            'password' => 'string|max:100',
+        ]);
 
-        return response()->json($users);
+        $user = User::findOrFail($userId);
+        if (!empty($request->name)) {
+            $user->name = $request->name;
+        }
+
+        if (!empty($request->password)) {
+            $user->password = app('hash')->make($request->password);
+        }
+
+        $user->save();
+
+        return response()->json($user);
     }
 
-    //
+    public function destroy()
+    {
+        $user = User::findOrFail($userId);
+        $user->delete();
+
+        return response()->json($user);
+    }
+
+    public function login()
+    {
+        //
+    }
+
+    public function logout()
+    {
+        //
+    }
 }

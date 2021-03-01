@@ -36,7 +36,7 @@ class UserTest extends TestCase
         $user = User::factory()->create();
         $req = [];
         $this->specify('Must be authorized', function() {
-            $response = $this->call('POST', '/user/1', []);
+            $response = $this->call('POST', '/user/123', []);
             $this->assertEquals(401, $response->status());
         });
 
@@ -47,14 +47,22 @@ class UserTest extends TestCase
             $this->assertEquals(404, $response->status());
         });
 
-        $this->specify('Should validate request', function() {
-            $user = User::factory()->create();
-            $response = $this->call('POST', '/user/123', []);
+        $user = User::factory()->create();
+        var_dump($user->id);
+        $this->specify('Should validate request', function() use ($user) {
+            $response = $this->call('POST', '/user/'+$user->id, []);
 
             $this->assertEquals(422, $response->status());
         });
 
-        $this->specify('Should respond with updated user', function() {
+        $this->specify('Should respond with updated user', function() use ($user) {
+            $req = [
+                'name' => 'Arty Fischel',
+            ];
+            $response = $this->call('POST', '/user/'+$user->id, $req);
+
+            $response->assertJsonFragment(['name'=>$req->name]);
+            $this->assertEquals(200, $response->status());
         });
     }
 
