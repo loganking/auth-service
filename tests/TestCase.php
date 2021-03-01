@@ -1,9 +1,16 @@
 <?php
 
+use Codeception\Specify;
+use Laravel\Lumen\Testing\DatabaseMigrations;
+use Laravel\Lumen\Testing\DatabaseTransactions;
 use Laravel\Lumen\Testing\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
+    use DatabaseMigrations;
+    use DatabaseTransactions;
+    use Specify;
+
     /**
      * Creates the application.
      *
