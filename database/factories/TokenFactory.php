@@ -3,16 +3,19 @@
 namespace Database\Factories;
 
 use App\Models\User;
+use App\Models\Token;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 
-class UserFactory extends Factory
+class TokenFactory extends Factory
 {
     /**
      * The name of the factory's corresponding model.
      *
      * @var string
      */
-    protected $model = User::class;
+    protected $model = Token::class;
 
     /**
      * Define the model's default state.
@@ -22,9 +25,11 @@ class UserFactory extends Factory
     public function definition()
     {
         return [
-            'name' => $this->faker->name,
-            'email' => $this->faker->unique()->safeEmail,
-            'password' => app('hash')->make($this->faker->password),
+            'user_id' => function() {
+                return User::factory()->create()->id;
+            },
+            'token' => Str::random(),
+            'expires_at' => Carbon::now()->add('1 hour'),
         ];
     }
 }
